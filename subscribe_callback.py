@@ -35,13 +35,15 @@ def importNewLibs():
 def print_msg(client, userdata, message):
     #print("%s : %s" % (message.topic, message.payload))
 
-    printf("incoming\n")
+    printf("\nincoming\n")
 
     dict_obj={}
 
     try:
-
+        printf(message)
         inc_msg=str(message.payload,'utf-8')
+        printf(inc_msg)
+
         msg_json=json.loads(inc_msg)
 
         printf(msg_json)
@@ -67,15 +69,15 @@ def print_msg(client, userdata, message):
         dict_obj["dev_id"]=dev_id
         dict_obj["payload"]=decoded
 
-        print(dict_obj)
+        print(json.dumps(dict_obj))
 
     except:
 
-        print("failed with the following:\n")
-        print(inc_msg)
-        print("\n")
-        print(rawb64)
-        print(dev_id)
-        print(time)
+        printf("\nfailed with the following:\n")
+        print(json.dumps(msg_json))
+        printf("\n")
+        printf(rawb64)
+        printf(dev_id)
+        printf(time)
 
 subscribe.callback(print_msg, "cambridge-sensor-network/devices/elsys-eye-044501/#", hostname="eu.thethings.network", auth={'username':"cambridge-sensor-network", 'password':"ttn-account-v2.7Bg6NW0rWeNwgkhyVfKmutJx3nDwR-R_SoLpB9KyzE4"})
