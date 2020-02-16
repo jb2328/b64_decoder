@@ -80,4 +80,4 @@ def print_msg(client, userdata, message):
         printf(dev_id)
         printf(time)
 
-subscribe.callback(print_msg, "cambridge-sensor-network/devices/elsys-eye-044501/#", hostname="eu.thethings.network", auth={'username':"cambridge-sensor-network", 'password':"ttn-account-v2.7Bg6NW0rWeNwgkhyVfKmutJx3nDwR-R_SoLpB9KyzE4"})
+subscribe.callback(print_msg, "cambridge-sensor-network/devices/elsys-eye-044501/#", hostname="eu.thethings.network", auth={'username':username, 'password':password})
