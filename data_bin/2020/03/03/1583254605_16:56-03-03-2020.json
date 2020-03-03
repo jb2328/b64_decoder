@@ -1,0 +1,1 @@
+{"time": "2020-03-03T16:56:45.189123347Z", "dev_id": "elsys-eye-044501", "payload_cooked": {"device": "elsys", "temperature": 24.0, "humidity": 29, "light": 170, "motion": 8, "vdd": 3615, "occupancy": 1}}

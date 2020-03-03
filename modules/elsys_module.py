@@ -29,16 +29,18 @@ TYPE_EXT_DIGITAL2 = 0x1A     # 1bytes value 1 or 0
 TYPE_EXT_ANALOG_UV= 0x1B     # 4 bytes signed int (uV)
 TYPE_DEBUG        = 0x3D     # 4bytes debug 
 
+hi="hello world"
+
 def bin8dec(bin):
-    num=bin&0xFF;
+    num=bin&0xFF
     if (0x80 & num): 
-        num = - (0x0100 - num);
+        num = - (0x0100 - num)
     return num
 
 def bin16dec(bin):
-    num=bin&0xFFFF;
+    num=bin&0xFFFF
     if (0x8000 & num):
-        num = - (0x010000 - num);
+        num = - (0x010000 - num)
     return num
 
 def hexToBytes(hex):
@@ -52,8 +54,9 @@ def b64ToHex(b64):
 
 def b64toBytes(b64):
     return base64.b64decode(b64)
-def DecodeElsysPayload(data):
-    obj = {};
+    
+def decodeElsysPayload(data):
+    obj = {}
     obj["device"]="elsys"
     #print("data ",data," len ",len(data))
     i=0
@@ -166,7 +169,12 @@ def DecodeElsysPayload(data):
         #Grideye data
         elif data[i] == TYPE_GRIDEYE:
             obj["grideye"]="8x8 missing"
-            i+=65
+            ref = data[i+1]
+            i+=1
+            obj.grideye = []
+            for j in range(0,64):
+                obj.grideye[j]=ref+(data[1+i+j]/10.0)
+            i+=64        
             
         #External Pressure
         elif data[i] == TYPE_PRESSURE:

@@ -17,67 +17,117 @@
 
 #import context  # Ensures paho is in PYTHONPATH
 import paho.mqtt.subscribe as subscribe
-import decoder
+#import elsysDecoder as decoder
 import json
+import secrets
 import importlib
+import time
+import os
 
-DEBUG=False
+DEBUG=True
 
 def printf(a):
     if(DEBUG):
         print(a)
 
-def importNewLibs():
+
+def save_to_file(data):
+
+    ts=str(time.strftime("%H:%M-%d-%m-%Y"))
+    unix_ts=str(int(time.time()))
+    filename=unix_ts+"_"+ts+".json"
+
+    # define the name of the directory to be created
+    path = str(os.getcwd())+str(time.strftime("/data_bin/%Y/%m/%d/"))
+    printf("Attempting to save in %s" %path)
+    try:
+        os.makedirs(path)
+    except OSError:
+        printf ("Creation of the directory %s failed" % path)
+    else:
+        printf ("Successfully created the directory %s" % path)
+
+    f= open(path+filename,"w+")
+    f.write(str(data))
+    f.close()
+    printf("File was written %s" %(path+filename))
+
+def import_all_libs():
     tree = os.listdir('modules')
+    print(tree)
     for i in tree:
-        importlib.import_module(i)
+        path=str(os.getcwd())+"/modules/"+str(i)
+        print("attempting ",path)
+        newpath="modules."+i.split('.')[0]
+        importlib.import_module(newpath, package=None)
+    #return importlib.import_module(tree[1], package=None) 
+
+def dynamic_import(lib):
+    tree = os.listdir('modules')
+    print(tree)
+    for i in tree:
+        i=i.split('.')[0]
+        newpath="modules."+i
+        print("attempting ",newpath)
+
+        if(i==lib):
+            return importlib.import_module(newpath, package=None)
+    #return importlib.import_module(tree[1], package=None) 
 
 def print_msg(client, userdata, message):
     #print("%s : %s" % (message.topic, message.payload))
 
-    printf("\nincoming\n")
+    printf("\n------------------INCOMING-----------------\n")
 
     dict_obj={}
 
     try:
-        printf(message)
         inc_msg=str(message.payload,'utf-8')
-        printf(inc_msg)
 
         msg_json=json.loads(inc_msg)
-
         printf(msg_json)
-        printf("\nDECODED:\n")
-
-        rawb64=msg_json["payload_raw"]
-        decoded=decoder.DecodeElsysPayload(decoder.b64toBytes(rawb64))
-
-        printf(rawb64)
-        printf(decoded)
-
+        
         dev_id=msg_json["dev_id"]
-
         printf(dev_id)
 
         time=msg_json["metadata"]["time"]
-
         printf(time)
+
+        printf("\n------------------DECODED------------------\n")
+
+        rawb64=msg_json["payload_raw"]
+        decoded=decoder.decodeElsysPayload(decoder.b64toBytes(rawb64))
+
+        printf(rawb64)
+        printf("\n")
+        printf(decoded)
         
-        printf("\nFINITO:\n")
+        printf("\n------------------FINITO------------------\n")
 
-        dict_obj["time"]=time
+        dict_obj["acp_ts"]=time
         dict_obj["dev_id"]=dev_id
-        dict_obj["payload"]=decoded
+        dict_obj["payload_cooked"]=decoded
 
-        print(json.dumps(dict_obj))
+        cleaned_data=json.dumps(dict_obj)
+
+        print(cleaned_data)
+        save_to_file(cleaned_data)
+        printf("\n-------------------------------------------\n")
 
     except:
-
+        printf("----------------EXCEPTION-----------------\n")
         printf("\nfailed with the following:\n")
         print(json.dumps(msg_json))
-        printf("\n")
-        printf(rawb64)
-        printf(dev_id)
-        printf(time)
+        printf("\n",rawb64,"\n", dev_id,"\n",time)
+        printf("-------------------------------------------\n")
+    
+def main():
+    #topic="cambridge-sensor-network/devices/#"                     #"cambridge-sensor-network/devices/elsys-eye-044501/#"
+    #printf("Starting MQTT subscription for %s" %topic)
+    #subscribe.callback(print_msg, topic, hostname="eu.thethings.network", auth={'username':secrets.username, 'password':secrets.password})
+    decoder=dynamic_import("elsys_module")
+    print("done")
+    print(decoder.hi)
+if __name__ == "__main__":
+    main()
 
-subscribe.callback(print_msg, "cambridge-sensor-network/devices/elsys-eye-044501/#", hostname="eu.thethings.network", auth={'username':username, 'password':password})
