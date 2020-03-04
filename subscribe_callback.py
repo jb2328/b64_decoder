@@ -24,7 +24,7 @@ import importlib
 import time
 import os
 
-DEBUG=True
+DEBUG=False
 
 def printf(a):
     if(DEBUG):
@@ -43,7 +43,7 @@ def save_to_file(data):
     try:
         os.makedirs(path)
     except OSError:
-        printf ("Creation of the directory %s failed" % path)
+        printf ("Creation of the directory %s failed (exists already)" % path)
     else:
         printf ("Successfully created the directory %s" % path)
 
@@ -63,71 +63,68 @@ def import_all_libs():
     #return importlib.import_module(tree[1], package=None) 
 
 def dynamic_import(lib):
+    #check all modules in modules dir
     tree = os.listdir('modules')
-    print(tree)
-    for i in tree:
-        i=i.split('.')[0]
-        newpath="modules."+i
-        print("attempting ",newpath)
-
-        if(i==lib):
-            return importlib.import_module(newpath, package=None)
-    #return importlib.import_module(tree[1], package=None) 
+    #print(tree)
+    try:
+        return importlib.import_module("modules."+lib, package=None)
+    except :
+        #Failed to find the right decoder -- return null decoder
+        return importlib.import_module("modules.generic",package=None)     #to be changed to directly go to importlib.import_module(lib)
 
 def print_msg(client, userdata, message):
-    #print("%s : %s" % (message.topic, message.payload))
 
     printf("\n------------------INCOMING-----------------\n")
 
     dict_obj={}
 
-    try:
-        inc_msg=str(message.payload,'utf-8')
+    inc_msg=str(message.payload,'utf-8')
 
-        msg_json=json.loads(inc_msg)
-        printf(msg_json)
-        
-        dev_id=msg_json["dev_id"]
-        printf(dev_id)
+    msg_json=json.loads(inc_msg)
+    printf(msg_json)
+    printf("\n")
+    
+    dev_id=msg_json["dev_id"]
+    dev_id_split=dev_id.split('-')[0]
 
-        time=msg_json["metadata"]["time"]
-        printf(time)
+    printf(dev_id)
+    printf("Decoder: "+str(dev_id_split))
 
-        printf("\n------------------DECODED------------------\n")
+    time=msg_json["metadata"]["time"]
+    printf(time)
 
-        rawb64=msg_json["payload_raw"]
-        decoded=decoder.decodeElsysPayload(decoder.b64toBytes(rawb64))
+    printf("\n------------------DECODED------------------\n")
 
-        printf(rawb64)
-        printf("\n")
-        printf(decoded)
-        
-        printf("\n------------------FINITO------------------\n")
+    rawb64=msg_json["payload_raw"]
 
-        dict_obj["acp_ts"]=time
-        dict_obj["dev_id"]=dev_id
-        dict_obj["payload_cooked"]=decoded
+    decoder=dynamic_import(dev_id_split)
+    printf("Decoder loaded... "+str(decoder.loaded))
 
-        cleaned_data=json.dumps(dict_obj)
+    decoded=decoder.decodePayload(decoder.b64toBytes(rawb64))
 
-        print(cleaned_data)
-        save_to_file(cleaned_data)
-        printf("\n-------------------------------------------\n")
+    printf(rawb64)
+    printf(decoded)
+    
+    printf("\n------------------FINITO------------------\n")
 
-    except:
-        printf("----------------EXCEPTION-----------------\n")
-        printf("\nfailed with the following:\n")
-        print(json.dumps(msg_json))
-        printf("\n",rawb64,"\n", dev_id,"\n",time)
-        printf("-------------------------------------------\n")
+    dict_obj["acp_ts"]=time
+    dict_obj["dev_id"]=dev_id
+    dict_obj["payload_cooked"]=decoded
+    print(dict_obj)
+  
+    save_to_file(dict_obj)
+    printf("\n-------------------------------------------\n")
+
     
 def main():
-    #topic="cambridge-sensor-network/devices/#"                     #"cambridge-sensor-network/devices/elsys-eye-044501/#"
-    #printf("Starting MQTT subscription for %s" %topic)
-    #subscribe.callback(print_msg, topic, hostname="eu.thethings.network", auth={'username':secrets.username, 'password':secrets.password})
-    decoder=dynamic_import("elsys_module")
-    print("done")
-    print(decoder.hi)
+    topic="cambridge-sensor-network/devices/#"                     #"cambridge-sensor-network/devices/elsys-eye-044501/#"
+    printf("Starting MQTT subscription for %s" %topic)
+    subscribe.callback(print_msg, topic, hostname="eu.thethings.network", auth={'username':secrets.username, 'password':secrets.password})
+    #decoder=dynamic_import("ijl20")
+    #printf("Decoder loaded... "+str(decoder.hi))
+    #decoded=decoder.decodePayload(decoder.b64toBytes("MjUuODE="))
+
+
 if __name__ == "__main__":
     main()
 
