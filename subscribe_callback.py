@@ -44,7 +44,6 @@ def import_all_libs():
         print("attempting ",path)
         module="modules."+i.split('.')[0]
         importlib.import_module(module, package=None)
-    #return importlib.import_module(tree[1], package=None) 
 
 def dynamic_import(lib):
   
@@ -90,7 +89,7 @@ def print_msg(client, userdata, message):
     printf(rawb64)
     printf(decoded)
     
-    printf("\n------------------FINITO------------------\n")
+    printf("\n------------------WRITING------------------\n")
 
     #loading all of the parsed data into final json file to be stored in the file system
     dict_obj["acp_ts"]=time
@@ -99,7 +98,7 @@ def print_msg(client, userdata, message):
     print(dict_obj)
   
     save_to_file(dict_obj)
-    printf("\n-------------------------------------------\n")
+    printf("\n------------------FINITO------------------\n")
 
     
 def main():
