@@ -1,23 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2016 Roger Light <roger@atchoo.org>
-#
-# All rights reserved. This program and the accompanying materials
-# are made available under the terms of the Eclipse Distribution License v1.0
-# which accompanies this distribution.
-#
-# The Eclipse Distribution License is available at
-#   http://www.eclipse.org/org/documents/edl-v10.php.
-#
-# Contributors:
-#    Roger Light - initial implementation
-
-# This shows an example of using the subscribe.callback helper function.
-
-#import context  # Ensures paho is in PYTHONPATH
 import paho.mqtt.subscribe as subscribe
-#import elsysDecoder as decoder
 import json
 import secrets
 import importlib
@@ -58,14 +42,12 @@ def import_all_libs():
     for i in tree:
         path=str(os.getcwd())+"/modules/"+str(i)
         print("attempting ",path)
-        newpath="modules."+i.split('.')[0]
-        importlib.import_module(newpath, package=None)
+        module="modules."+i.split('.')[0]
+        importlib.import_module(module, package=None)
     #return importlib.import_module(tree[1], package=None) 
 
 def dynamic_import(lib):
-    #check all modules in modules dir
-    tree = os.listdir('modules')
-    #print(tree)
+  
     try:
         return importlib.import_module("modules."+lib, package=None)
     except :
@@ -78,12 +60,14 @@ def print_msg(client, userdata, message):
 
     dict_obj={}
 
+    #loading the message and parsing it
     inc_msg=str(message.payload,'utf-8')
 
     msg_json=json.loads(inc_msg)
     printf(msg_json)
     printf("\n")
     
+    #acquiring dev_id and dev_id_split to be used for decoder selection
     dev_id=msg_json["dev_id"]
     dev_id_split=dev_id.split('-')[0]
 
@@ -97,6 +81,7 @@ def print_msg(client, userdata, message):
 
     rawb64=msg_json["payload_raw"]
 
+    #loading the decoder based on the first word of dev_id
     decoder=dynamic_import(dev_id_split)
     printf("Decoder loaded... "+str(decoder.loaded))
 
@@ -107,6 +92,7 @@ def print_msg(client, userdata, message):
     
     printf("\n------------------FINITO------------------\n")
 
+    #loading all of the parsed data into final json file to be stored in the file system
     dict_obj["acp_ts"]=time
     dict_obj["dev_id"]=dev_id
     dict_obj["payload_cooked"]=decoded
@@ -120,9 +106,6 @@ def main():
     topic="cambridge-sensor-network/devices/#"                     #"cambridge-sensor-network/devices/elsys-eye-044501/#"
     printf("Starting MQTT subscription for %s" %topic)
     subscribe.callback(print_msg, topic, hostname="eu.thethings.network", auth={'username':secrets.username, 'password':secrets.password})
-    #decoder=dynamic_import("ijl20")
-    #printf("Decoder loaded... "+str(decoder.hi))
-    #decoded=decoder.decodePayload(decoder.b64toBytes("MjUuODE="))
 
 
 if __name__ == "__main__":

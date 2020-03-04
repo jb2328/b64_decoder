@@ -58,7 +58,7 @@ def b64toBytes(b64):
 def decodePayload(data):
     obj = {}
     obj["device"]="elsys"
-    #print("data ",data," len ",len(data))
+
     i=0
     while(i<len(data)):
         #Temperature

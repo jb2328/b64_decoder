@@ -17,7 +17,7 @@ def bin16dec(bin):
 def b64toBytes(b64):
     return base64.b64decode(b64)
 
-def decodeAdeunisPayload(bytes):
+def decodePayload(bytes):
     decoded={}
     decoded["device"]= "adeunis_test"
     
@@ -30,7 +30,7 @@ def decodeAdeunisPayload(bytes):
     
     #// Button press
     if (bytes[0] & 0x20): # // Button was pressed
-        decoded['button'] = true
+        decoded['button'] = True
     
     #// GPS
     if (bytes[0] & 0x10): # // gps present
@@ -50,11 +50,11 @@ def decodeAdeunisPayload(bytes):
         minutes = (bytes[offset+1] & 0x0F) * 10 + (bytes[offset+2] >> 4) + (bytes[offset+2] & 0x0F) / 10 + (bytes[offset+3] >> 4) / 100
           #//decoded['lng_mins'] = minutes;
       
-        lng_west = bytes[offset+3] & 0x01;
+        lng_west = bytes[offset+3] & 0x01
         decoded['longitude'] = (-1 if lng_west else 1) * degrees + minutes / 60
         decoded['gps_reception'] = bytes[offset+4] >> 4
         decoded['gps_satellites'] = bytes[offset+4] & 0x0F
-        offset += 5;
+        offset += 5
     
     
     if (bytes[0] & 0x08):  #// Uplink count present
