@@ -1,0 +1,1 @@
+{"acp_ts": "2020-03-05T17:37:23.65925592Z", "dev_id": "elsys-co2-0461e7", "payload_cooked": {"device": "elsys", "temperature": 23.3, "humidity": 31, "light": 258, "motion": 3, "co2": 656, "vdd": 3663}}

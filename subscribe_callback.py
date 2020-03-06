@@ -96,8 +96,11 @@ def print_msg(client, userdata, message):
     dict_obj["dev_id"]=dev_id
     dict_obj["payload_cooked"]=decoded
     print(dict_obj)
-  
-    save_to_file(dict_obj)
+    #try/catch to be removed -- debug
+    try:
+        save_to_file(json.dumps(dict_obj))
+    except:
+        save_to_file('{"data":"failed to write to disk"}')
     printf("\n------------------FINITO------------------\n")
 
     
