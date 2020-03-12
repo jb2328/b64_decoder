@@ -1,4 +1,5 @@
 import base64
+import json
 
 TYPE_TEMP         = 0x01 #temp 2 bytes -3276.8°C -->3276.7°C
 TYPE_RH           = 0x02 #Humidity 1 byte  0-100%
@@ -30,6 +31,24 @@ TYPE_EXT_ANALOG_UV= 0x1B     # 4 bytes signed int (uV)
 TYPE_DEBUG        = 0x3D     # 4bytes debug 
 
 loaded="ELSYS"
+
+decoder_name="elsys"
+
+def test(message):
+    #regular topic format:
+    #cambridge-sensor-network/devices/elsys-ems-048f2b/up
+
+    msg=json.loads(message.payload)
+    topic=message.topic
+
+    if(decoder_name in topic):  #check if decoder name appears in the topic
+        return True
+    else if ("dev_id" in msg):  #dev_id for example, can be any other key
+        if(decoder_name in msg["dev_id"]):
+            return True
+        #elif...
+        else return False
+    else return False
 
 def bin8dec(bin):
     num=bin&0xFF

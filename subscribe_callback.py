@@ -9,6 +9,16 @@ import time
 import os
 
 DEBUG=False
+#|  PROPERTY_NAME   |  PROPERTY_VALUE      | DECODER  |
+#|  dev_id          |  elsys[-co2-041ba9]  | elsys    |
+# 
+# for unique dict key combine prop_name+prop_val
+# 
+  
+lookup_table={
+    "dev_id_elsys-co2-041ba9":"elsys",
+    "dev_id_elsys-eye-044504":"elsys",
+}
 
 def printf(a):
     if(DEBUG):
@@ -54,7 +64,7 @@ def dynamic_import(lib):
         return importlib.import_module("modules.generic",package=None)     #to be changed to directly go to importlib.import_module(lib)
 
 def print_msg(client, userdata, message):
-
+    print(message.topic)
     printf("\n------------------INCOMING-----------------\n")
 
     dict_obj={}
@@ -95,7 +105,9 @@ def print_msg(client, userdata, message):
     dict_obj["acp_ts"]=time
     dict_obj["dev_id"]=dev_id
     dict_obj["payload_cooked"]=decoded
-    print(dict_obj)
+    #print(dict_obj)
+    print(msg_json["hardware_serial"],msg_json["dev_id"])
+    #print(msg_json["dev_id"])
     #try/catch to be removed -- debug
     try:
         save_to_file(json.dumps(dict_obj))
@@ -105,7 +117,7 @@ def print_msg(client, userdata, message):
 
     
 def main():
-    topic="cambridge-sensor-network/devices/#"                     #"cambridge-sensor-network/devices/elsys-eye-044501/#"
+    topic="cambridge-sensor-network/devices/+/up"                     #"cambridge-sensor-network/devices/elsys-eye-044501/#"
     printf("Starting MQTT subscription for %s" %topic)
     subscribe.callback(print_msg, topic, hostname="eu.thethings.network", auth={'username':secrets.username, 'password':secrets.password})
 
