@@ -1,1 +1,0 @@
-{"time": "2020-03-04T14:43:00.848403909Z", "dev_id": "elsys-ems-048f2b", "payload_cooked": {"device": "elsys", "temperature": 24.5, "humidity": 28, "x": 1, "y": 0, "z": 60, "vdd": 3622, "pulseAbs": 287, "digital": 1, "accMotion": 0, "waterleak": 0}}

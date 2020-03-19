@@ -1,1 +1,0 @@
-{'acp_ts': '2020-03-04T17:16:39.669346209Z', 'dev_id': 'elsys-eye-044501', 'payload_cooked': {'device': 'elsys', 'temperature': 24.7, 'humidity': 27, 'light': 343, 'motion': 2, 'vdd': 3569, 'occupancy': 1}}

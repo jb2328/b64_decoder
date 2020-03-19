@@ -1,1 +1,0 @@
-{"time": "2020-03-03T17:02:22.424244323Z", "dev_id": "elsys-co2-0461e3", "payload_cooked": {"device": "elsys", "temperature": 20.5, "humidity": 37, "light": 133, "motion": 2, "co2": 1058, "vdd": 3659}}
