@@ -1,2 +1,4 @@
 data_bin/
 secrets.py
+data_bin
+__pycache__

@@ -43,12 +43,13 @@ def test(message):
 
     if(decoder_name in topic):  #check if decoder name appears in the topic
         return True
-    else if ("dev_id" in msg):  #dev_id for example, can be any other key
+    elif ("dev_id" in msg):  #dev_id for example, can be any other key
         if(decoder_name in msg["dev_id"]):
             return True
-        #elif...
-        else return False
-    else return False
+        else:
+            return False
+    else:
+        return False
 
 def bin8dec(bin):
     num=bin&0xFF
@@ -188,11 +189,13 @@ def decodePayload(data):
         #Grideye data
         elif data[i] == TYPE_GRIDEYE:
             obj["grideye"]="8x8 missing"
+            print(obj["grideye"])
             ref = data[i+1]
             i+=1
-            obj.grideye = []
+            obj['grideye'] = []
             for j in range(0,64):
-                obj.grideye[j]=ref+(data[1+i+j]/10.0)
+                print(j)
+                obj['grideye'].append(ref+(data[1+i+j]/10.0))
             i+=64        
             
         #External Pressure

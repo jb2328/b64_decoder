@@ -7,7 +7,7 @@ import secrets
 import importlib
 import time
 import os
-
+#import modules.elsys as decoder
 DEBUG=False
 #|  PROPERTY_NAME   |  PROPERTY_VALUE      | DECODER  |
 #|  dev_id          |  elsys[-co2-041ba9]  | elsys    |
@@ -27,7 +27,7 @@ def printf(a):
 
 def save_to_file(data):
 
-    ts=str(time.strftime("%H:%M-%d-%m-%Y"))
+    ts=str(time.strftime("%Y-%m-%d-%H-%M"))
     unix_ts=str(int(time.time()))
     filename=unix_ts+"_"+ts+".json"
 
@@ -56,10 +56,11 @@ def import_all_libs():
         importlib.import_module(module, package=None)
 
 def dynamic_import(lib):
-  
+    printf("modules."+lib)
     try:
         return importlib.import_module("modules."+lib, package=None)
     except :
+        printf("failed...")
         #Failed to find the right decoder -- return null decoder
         return importlib.import_module("modules.generic",package=None)     #to be changed to directly go to importlib.import_module(lib)
 
@@ -105,8 +106,8 @@ def print_msg(client, userdata, message):
     dict_obj["acp_ts"]=time
     dict_obj["dev_id"]=dev_id
     dict_obj["payload_cooked"]=decoded
-    #print(dict_obj)
-    print(msg_json["hardware_serial"],msg_json["dev_id"])
+    print(dict_obj)
+    #print(msg_json["hardware_serial"],msg_json["dev_id"])
     #print(msg_json["dev_id"])
     #try/catch to be removed -- debug
     try:
@@ -117,9 +118,13 @@ def print_msg(client, userdata, message):
 
     
 def main():
-    topic="cambridge-sensor-network/devices/+/up"                     #"cambridge-sensor-network/devices/elsys-eye-044501/#"
-    printf("Starting MQTT subscription for %s" %topic)
-    subscribe.callback(print_msg, topic, hostname="eu.thethings.network", auth={'username':secrets.username, 'password':secrets.password})
+    #topic1="cambridge-sensor-network/devices/elsys-co2-041ba9/up"                     #"cambridge-sensor-network/devices/elsys-eye-044501/#"
+    topic2="cambridge-sensor-network/devices/+/up"     
+    #print("Starting MQTT subscription for %s" %topic1)
+    print("Starting MQTT subscription for %s" %topic2)
+    subscribe.callback(print_msg, topic2, hostname="eu.thethings.network", auth={'username':secrets.username, 'password':secrets.password})
+
+    #subscribe.callback(print_msg, topic1, hostname="eu.thethings.network", auth={'username':secrets.username, 'password':secrets.password})
 
 
 if __name__ == "__main__":
